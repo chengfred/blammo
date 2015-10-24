@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://js.simperium.com/v0.1/"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script>
+            var app_id = 'hyphens-angles-449';
+            var token = 'PUT TOKEN HERE';
+
+            var simperium = new Simperium(app_id, { token: token });
+
+            var bucket = simperium.bucket('blammo');
+
+            bucket.on('ready', function() {
+                console.log("bucket connected and ready!");
+            });
+
+            bucket.on('local', function(id) {
+                if (id === 'whammo') {
+                    // simperium will call this function when it needs to know the current state of 'whammo' so it can send it to the server
+                    return {
+                        'stuff' : $('#content').val()
+                    };
+                }
+            });
+
+            bucket.on('notify', function(id, data) {
+                if (id == 'whammo') {
+                    // simperium is notifying us of new data for 'whammo', we just set the textarea value here
+                    $('#content').val(data['stuff']);
+                }
+            });
+
+            $('document').ready(function() {
+                $('#content').on('change keyup paste', function() {
+                    // tells simperium to update the object 'whammo' in the bucket
+                    bucket.update('whammo');
+                });
+                bucket.start();
+            });
+
+        </script>
+    </head>
+    <body>
+        <textarea id="content">HI</textarea>
+    </body>
+</html>
+
